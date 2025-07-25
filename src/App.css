@@ -1,0 +1,26 @@
+/* App-specific styles */
+.App {
+  text-align: center;
+}
+
+/* Custom input styles for better UX */
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Custom table hover effects */
+.table-row:hover {
+  background-color: rgba(249, 250, 251, 1);
+}
+
+/* Loading animation styles */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import pool from '../db';
-import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import type { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // Get inventory accessible by the user
 router.get('/', async (req: AuthenticatedRequest, res) => {
-  const { userId, role, orgId } = req.user!;
+  const { id: userId, role, organization_id: orgId } = req.user!;
 
   try {
     let query;

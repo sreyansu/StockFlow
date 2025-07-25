@@ -1,23 +1,30 @@
-import { StackProvider, useUser } from '@stackframe/react';
-import { stackClientApp } from './stack';
+import { StackHandler, StackProvider, StackTheme } from "@stackframe/react";
+import { Suspense } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { stackClientApp } from "./stack";
+import MainPage from "./pages/MainPage";
 
-function DebugComponent() {
-  const user = useUser();
-
+function HandlerRoutes() {
+  const location = useLocation();
+  
   return (
-    <div>
-      <h1>User Authentication State:</h1>
-      <pre>
-        {JSON.stringify(user, null, 2)}
-      </pre>
-    </div>
+    <StackHandler app={stackClientApp} location={location.pathname} fullPage />
   );
 }
 
 export default function App() {
   return (
-    <StackProvider app={stackClientApp}>
-      <DebugComponent />
-    </StackProvider>
+    <Suspense fallback={null}>
+      <BrowserRouter>
+        <StackProvider app={stackClientApp}>
+          <StackTheme>
+            <Routes>
+              <Route path="/handler/*" element={<HandlerRoutes />} />
+              <Route path="/*" element={<MainPage />} />
+            </Routes>
+          </StackTheme>
+        </StackProvider>
+      </BrowserRouter>
+    </Suspense>
   );
 }

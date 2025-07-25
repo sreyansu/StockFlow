@@ -3,8 +3,10 @@ import jwt from 'jsonwebtoken';
 import pool from '../db';
 
 interface AuthRequest extends Request {
-  user?: { id: string; role: string };
+  user?: { id: string; role: string; organization_id: string };
 }
+
+export type AuthenticatedRequest = AuthRequest;
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token;
@@ -19,7 +21,7 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
       // The 'sub' claim in a standard JWT typically holds the user ID
       const userId = decoded.sub;
 
-      const result = await pool.query('SELECT id, role FROM users WHERE id = $1', [userId]);
+      const result = await pool.query('SELECT id, role, organization_id FROM users WHERE id = $1', [userId]);
 
       if (result.rows.length > 0) {
         req.user = result.rows[0];

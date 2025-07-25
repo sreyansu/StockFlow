@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import pool from '../db';
-import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import type { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -9,7 +9,7 @@ router.get('/staff/unapproved', async (req: AuthenticatedRequest, res) => {
   try {
     const result = await pool.query(
       'SELECT id, first_name, last_name, email FROM users WHERE organization_id = $1 AND role = $2 AND approved = $3',
-      [req.user!.orgId, 'staff', false]
+      [req.user!.organization_id, 'staff', false]
     );
     res.json(result.rows);
   } catch (error) {
@@ -22,7 +22,7 @@ router.get('/staff/unapproved', async (req: AuthenticatedRequest, res) => {
 router.put('/staff/approve/:id', async (req: AuthenticatedRequest, res) => {
   try {
     await pool.query('UPDATE users SET approved = true WHERE id = $1 AND organization_id = $2',
-     [req.params.id, req.user!.orgId]);
+     [req.params.id, req.user!.organization_id]);
     res.json({ message: 'Staff member approved' });
   } catch (error) {
     console.error('Error approving staff:', error);
@@ -35,7 +35,7 @@ router.post('/categories', async (req: AuthenticatedRequest, res) => {
   const { name } = req.body;
   try {
     await pool.query('INSERT INTO inventory_categories (organization_id, name) VALUES ($1, $2)',
-     [req.user!.orgId, name]);
+     [req.user!.organization_id, name]);
     res.status(201).json({ message: 'Category created' });
   } catch (error) {
     console.error('Error creating category:', error);
@@ -48,8 +48,8 @@ router.post('/staff/assign-category', async (req: AuthenticatedRequest, res) => 
   const { userId, categoryId } = req.body;
   try {
     // Ensure the user and category belong to the admin's organization
-    const userResult = await pool.query('SELECT id FROM users WHERE id = $1 AND organization_id = $2', [userId, req.user!.orgId]);
-    const categoryResult = await pool.query('SELECT id FROM inventory_categories WHERE id = $1 AND organization_id = $2', [categoryId, req.user!.orgId]);
+    const userResult = await pool.query('SELECT id FROM users WHERE id = $1 AND organization_id = $2', [userId, req.user!.organization_id]);
+    const categoryResult = await pool.query('SELECT id FROM inventory_categories WHERE id = $1 AND organization_id = $2', [categoryId, req.user!.organization_id]);
 
     if (userResult.rows.length === 0 || categoryResult.rows.length === 0) {
       return res.status(404).json({ message: 'User or category not found in your organization.' });
